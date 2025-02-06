@@ -1,2 +1,2 @@
 # dlx
-An implementation of the Dancing Links technique.
+An implementation of the Dancing Links technique for solving exact cover problems.
