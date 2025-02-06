@@ -1,8 +1,8 @@
 use std::io;
 
 #[derive(Debug)]
-struct Record<'a> {
-    name: Option<&'a str>,
+struct Record {
+    name: Option<String>,
     length: usize,
     left: usize,
     right: usize,
@@ -10,14 +10,14 @@ struct Record<'a> {
     down: usize,
 }
 
-impl<'a> Record<'a> {
-    fn new(name: &'a str, i: usize) -> Self {
+impl Record {
+    fn new(name: &str, i: usize) -> Self {
         if i == 0 {
             panic!("Record cannot be initialized if index is 0.");
         }
 
         Record {
-            name: Some(name),
+            name: Some(name.to_string()),
             length: 0,
             left: i - 1,
             right: i + 1,
