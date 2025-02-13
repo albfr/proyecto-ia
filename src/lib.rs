@@ -8,6 +8,7 @@ pub struct DancingLinks {
     item_header: Vec<Record>,
     node_list: Vec<Node>,
     item_index: HashMap<String, usize>,
+    backtrack: Vec<usize>,
 }
 
 impl DancingLinks {
@@ -20,6 +21,7 @@ impl DancingLinks {
             item_header: Vec::with_capacity(n + 2),
             node_list: Vec::with_capacity(n + 2),
             item_index: HashMap::new(),
+            backtrack: Vec::new(),
         };
 
         dlx.item_header.push(Record::new_unnamed(n1, 1));
@@ -65,7 +67,7 @@ impl DancingLinks {
                     panic!("Options must contain unique items.");
                 }
 
-                let u = self.get_node(i).up;
+                let u = self.get_up(i);
                 let j = self.get_list_len();
 
                 self.add_node(i);
@@ -80,16 +82,19 @@ impl DancingLinks {
         }
 
         self.node_list
-            .push(Node::new(self.get_node(spacer).top - 1, spacer + 1, 0));
+            .push(Node::new(self.get_top(spacer) - 1, spacer + 1, 0));
         self.set_down(spacer, self.get_list_len() - 2);
     }
 
     pub fn dance(&mut self) {
-        let mut level = 0;
-        let mut solution = Vec::new();
-        let mut exit_level = false;
+        let z = self.get_list_len() - 1;
+        self.backtrack
+            .resize((-self.get_top(z)).try_into().unwrap(), 0);
 
-        let mut total_solutions = 0;
+        let mut level = 0;
+        let mut solution_count = 0;
+
+        let mut exit_level = false;
 
         loop {
             let check_exit = exit_level;
@@ -97,13 +102,13 @@ impl DancingLinks {
 
             let mut i;
 
-            if self.get_item(0).right != 0 && !check_exit {
+            if self.get_right(0) != 0 && !check_exit {
                 let mut min_length = usize::MAX;
-                let mut p = self.get_item(0).right;
+                let mut p = self.get_right(0);
                 i = p;
 
                 while p != 0 {
-                    let length = self.get_item(p).length;
+                    let length = self.get_length(p);
 
                     if length < min_length {
                         min_length = length;
@@ -114,43 +119,15 @@ impl DancingLinks {
                         }
                     }
 
-                    p = self.get_item(p).right;
+                    p = self.get_right(p);
                 }
 
                 self.cover(i);
 
-                if level == solution.len() {
-                    solution.push(self.get_node(i).down);
-                } else if level < solution.len() {
-                    solution[level] = self.get_node(i).down;
-                } else {
-                    panic!("Cannot skip levels in solution.");
-                }
+                self.backtrack[level] = self.get_down(i);
             } else {
                 if !check_exit {
-                    total_solutions += 1;
-
-                    if total_solutions % 1000000 == 0 {
-                        println!("found another million!");
-                        println!("total so far: {total_solutions}");
-                    }
-                    /*
-                    println!("Visiting solution...");
-                    for j in 0..level {
-                        let mut r = solution[j];
-                        while self.get_node(r).top >= 0 {
-                            r += 1;
-                        }
-
-                        r = self.get_node(r).up;
-                        let position = self.get_item(self.get_node(r).top.try_into().unwrap()).name.clone().unwrap();
-                        let digit = self.get_item(self.get_node(r + 1).top.try_into().unwrap()).name.clone().unwrap().chars().last().unwrap();
-
-                        println!("{} {}", position, digit);
-                    }
-
-                    println!("Finished visiting solution!");
-                    */
+                    solution_count += 1;
                 }
 
                 if level == 0 {
@@ -159,32 +136,34 @@ impl DancingLinks {
 
                 level -= 1;
 
-                let mut p = solution[level] - 1;
+                let x = self.backtrack[level];
+                let mut p = x - 1;
 
-                while p != solution[level] {
-                    let j = self.get_node(p).top;
+                while p != x {
+                    let j = self.get_top(p);
                     if j <= 0 {
-                        p = self.get_node(p).down;
+                        p = self.get_down(p);
                     } else {
                         self.uncover(j.try_into().unwrap());
                         p -= 1;
                     }
                 }
 
-                i = self.get_node(solution[level]).top.try_into().unwrap();
-                solution[level] = self.get_node(solution[level]).down;
+                i = self.get_top(x).try_into().unwrap();
+                self.backtrack[level] = self.get_down(x);
             }
 
-            if solution[level] == i {
+            if self.backtrack[level] == i {
                 self.uncover(i);
                 exit_level = true;
             } else {
-                let mut p = solution[level] + 1;
+                let x = self.backtrack[level];
+                let mut p = x + 1;
 
-                while p != solution[level] {
-                    let j = self.get_node(p).top;
+                while p != x {
+                    let j = self.get_top(p);
                     if j <= 0 {
-                        p = self.get_node(p).up;
+                        p = self.get_up(p);
                     } else {
                         self.cover(j.try_into().unwrap());
                         p += 1;
@@ -195,19 +174,19 @@ impl DancingLinks {
             }
         }
 
-        println!("Finished dancing. Found {total_solutions} solutions.");
+        println!("Finished dancing. Found {solution_count} solutions.");
     }
 
     fn cover(&mut self, i: usize) {
-        let mut p = self.get_node(i).down;
+        let mut p = self.get_down(i);
 
         while p != i {
             self.hide(p);
-            p = self.get_node(p).down;
+            p = self.get_down(p);
         }
 
-        let l = self.get_item(i).left;
-        let r = self.get_item(i).right;
+        let l = self.get_left(i);
+        let r = self.get_right(i);
 
         self.set_right(l, r);
         self.set_left(r, l);
@@ -217,10 +196,9 @@ impl DancingLinks {
         let mut q = p + 1;
 
         while q != p {
-            let node = self.get_node(q);
-            let t = node.top;
-            let u = node.up;
-            let d = node.down;
+            let t = self.get_top(q);
+            let u = self.get_up(q);
+            let d = self.get_down(q);
 
             if t <= 0 {
                 q = u;
@@ -234,17 +212,17 @@ impl DancingLinks {
     }
 
     fn uncover(&mut self, i: usize) {
-        let l = self.get_item(i).left;
-        let r = self.get_item(i).right;
+        let l = self.get_left(i);
+        let r = self.get_right(i);
 
         self.set_right(l, i);
         self.set_left(r, i);
 
-        let mut p = self.get_node(i).up;
+        let mut p = self.get_up(i);
 
         while p != i {
             self.unhide(p);
-            p = self.get_node(p).up;
+            p = self.get_up(p);
         }
     }
 
@@ -252,10 +230,9 @@ impl DancingLinks {
         let mut q = p - 1;
 
         while q != p {
-            let node = self.get_node(q);
-            let t = node.top;
-            let u = node.up;
-            let d = node.down;
+            let t = self.get_top(q);
+            let u = self.get_up(q);
+            let d = self.get_down(q);
 
             if t <= 0 {
                 q = d;
@@ -268,24 +245,40 @@ impl DancingLinks {
         }
     }
 
-    fn get_item(&self, i: usize) -> &Record {
-        &self.item_header[i]
-    }
-
-    fn get_node(&self, i: usize) -> &Node {
-        &self.node_list[i]
-    }
-
-    fn get_list_len(&self) -> usize {
-        self.node_list.len()
-    }
-
     fn add_node(&mut self, i: usize) {
         self.item_header[i].add_node();
     }
 
     fn remove_node(&mut self, i: usize) {
         self.item_header[i].remove_node();
+    }
+
+    fn get_list_len(&self) -> usize {
+        self.node_list.len()
+    }
+
+    fn get_length(&self, i: usize) -> usize {
+        self.item_header[i].length
+    }
+
+    fn get_left(&self, i: usize) -> usize {
+        self.item_header[i].left
+    }
+
+    fn get_right(&self, i: usize) -> usize {
+        self.item_header[i].right
+    }
+
+    fn get_top(&self, i: usize) -> isize {
+        self.node_list[i].top
+    }
+
+    fn get_up(&self, i: usize) -> usize {
+        self.node_list[i].up
+    }
+
+    fn get_down(&self, i: usize) -> usize {
+        self.node_list[i].down
     }
 
     fn set_left(&mut self, i: usize, l: usize) {
