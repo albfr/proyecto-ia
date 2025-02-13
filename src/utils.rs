@@ -45,11 +45,7 @@ impl Record {
 
 impl Node {
     pub fn new(top: isize, up: usize, down: usize) -> Self {
-        Node {
-            top,
-            up,
-            down,
-        }
+        Node { top, up, down }
     }
 
     pub fn new_spacer() -> Self {

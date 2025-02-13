@@ -79,7 +79,8 @@ impl DancingLinks {
             }
         }
 
-        self.node_list.push(Node::new(self.get_node(spacer).top - 1, spacer + 1, 0));
+        self.node_list
+            .push(Node::new(self.get_node(spacer).top - 1, spacer + 1, 0));
         self.set_down(spacer, self.get_list_len() - 2);
     }
 
@@ -192,7 +193,7 @@ impl DancingLinks {
 
                 level += 1;
             }
-        };
+        }
 
         println!("Finished dancing. Found {total_solutions} solutions.");
     }

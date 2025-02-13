@@ -59,7 +59,7 @@ fn main() {
         dlx.add_option(&option_buffer);
 
         option_buffer.clear();
-    };
+    }
 
     dlx.dance();
 }
