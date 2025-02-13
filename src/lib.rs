@@ -1,96 +1,13 @@
+mod utils;
+
 use std::collections::{HashMap, HashSet};
 
-pub struct Record {
-    pub name: Option<String>,
-    pub length: usize,
-    pub left: usize,
-    pub right: usize,
-}
-
-pub struct Node {
-    pub top: isize,
-    pub up: usize,
-    pub down: usize,
-}
+use crate::utils::*;
 
 pub struct DancingLinks {
     item_header: Vec<Record>,
     node_list: Vec<Node>,
     item_index: HashMap<String, usize>,
-}
-
-impl Record {
-    fn new(name: &str, i: usize) -> Self {
-        if i == 0 {
-            panic!("Record cannot be initialized if index is 0.");
-        }
-
-        Record {
-            name: Some(name.to_string()),
-            length: 0,
-            left: i - 1,
-            right: i + 1,
-        }
-    }
-
-    fn new_unnamed(left: usize, right: usize) -> Self {
-        Record {
-            name: None,
-            length: 0,
-            left,
-            right,
-        }
-    }
-
-    fn add_node(&mut self) {
-        self.length += 1;
-    }
-
-    fn remove_node(&mut self) {
-        self.length -= 1;
-    }
-
-    fn set_left(&mut self, l: usize) {
-        self.left = l;
-    }
-
-    fn set_right(&mut self, r: usize) {
-        self.right = r;
-    }
-}
-
-impl Node {
-    fn new(top: isize, up: usize, down: usize) -> Self {
-        Node {
-            top,
-            up,
-            down,
-        }
-    }
-
-    fn new_spacer() -> Self {
-        Node {
-            top: 0,
-            up: 0,
-            down: 0,
-        }
-    }
-
-    fn new_header(i: usize) -> Self {
-        Node {
-            top: 0,
-            up: i,
-            down: i,
-        }
-    }
-
-    fn set_up(&mut self, u: usize) {
-        self.up= u;
-    }
-
-    fn set_down(&mut self, d: usize) {
-        self.down= d;
-    }
 }
 
 impl DancingLinks {
@@ -99,106 +16,54 @@ impl DancingLinks {
         let n2 = secondary_items.len();
         let n = n1 + n2;
 
-        let mut item_header: Vec<Record> = Vec::with_capacity(n + 2);
-        let mut node_list: Vec<Node> = Vec::with_capacity(n + 2);
-        let mut item_index = HashMap::new();
+        let mut dlx = DancingLinks {
+            item_header: Vec::with_capacity(n + 2),
+            node_list: Vec::with_capacity(n + 2),
+            item_index: HashMap::new(),
+        };
 
-        item_header.push(Record::new_unnamed(n1, 1));
-        node_list.push(Node::new_spacer());
-
-        let mut i = 1;
+        dlx.item_header.push(Record::new_unnamed(n1, 1));
+        dlx.node_list.push(Node::new_spacer());
 
         for item in primary_items {
-            item_header.push(Record::new(item, i));
-            node_list.push(Node::new_header(i));
-
-            if item_index.contains_key(item) {
-                panic!("Item names must be unique.");
-            }
-
-            item_index.insert(item.to_string(), i);
-
-            i += 1;
+            dlx.add_item(item);
         }
-
-        item_header[n1].set_right(0);
 
         for item in secondary_items {
-            item_header.push(Record::new(item, i));
-            node_list.push(Node::new_header(i));
-
-            if item_index.contains_key(item) {
-                panic!("Item names must be unique.");
-            }
-
-            item_index.insert(item.to_string(), i);
-
-            i += 1;
+            dlx.add_item(item);
         }
 
-        item_header.push(Record::new_unnamed(n, n1 + 1));
-        node_list.push(Node::new_spacer());
+        dlx.item_header.push(Record::new_unnamed(n, n1 + 1));
+        dlx.node_list.push(Node::new_spacer());
 
-        item_header[n1 + 1].set_left(n + 1);
+        dlx.item_header[n1].right = 0;
+        dlx.item_header[n1 + 1].left = n + 1;
 
-        DancingLinks {
-            item_header,
-            node_list,
-            item_index,
+        dlx
+    }
+
+    fn add_item(&mut self, item: &str) {
+        if self.item_index.contains_key(item) {
+            panic!("Item names must be unique.");
         }
-    }
 
-    pub fn get_item(&self, i: usize) -> &Record {
-        &self.item_header[i]
-    }
+        let i = self.get_list_len();
 
-    pub fn get_root_item(&self) -> &Record {
-        self.get_item(0)
-    }
-
-    pub fn get_node(&self, i: usize) -> &Node {
-        &self.node_list[i]
-    }
-
-    fn get_list_len(&self) -> usize {
-        self.node_list.len()
-    }
-
-    fn add_node(&mut self, i: usize) {
-        self.item_header[i].add_node();
-    }
-
-    fn remove_node(&mut self, i: usize) {
-        self.item_header[i].remove_node();
-    }
-
-    fn set_left(&mut self, i: usize, l: usize) {
-        self.item_header[i].set_left(l);
-    }
-
-    fn set_right(&mut self, i: usize, r: usize) {
-        self.item_header[i].set_right(r);
-    }
-
-    fn set_up(&mut self, i: usize, u: usize) {
-        self.node_list[i].set_up(u);
-    }
-
-    fn set_down(&mut self, i: usize, d: usize) {
-        self.node_list[i].set_down(d);
+        self.item_header.push(Record::new(item, i));
+        self.node_list.push(Node::new_header(i));
+        self.item_index.insert(item.to_string(), i);
     }
 
     pub fn add_option(&mut self, option_str: &str) {
-        let spacer = self.get_list_len() - 1;
         let mut option_items = HashSet::new();
+
+        let spacer = self.get_list_len() - 1;
 
         for item_name in option_str.split_whitespace() {
             if let Some(&i) = self.item_index.get(item_name) {
                 if option_items.contains(&i) {
                     panic!("Options must contain unique items.");
                 }
-
-                option_items.insert(i);
 
                 let u = self.get_node(i).up;
                 let j = self.get_list_len();
@@ -207,6 +72,8 @@ impl DancingLinks {
                 self.node_list.push(Node::new(i.try_into().unwrap(), u, i));
                 self.set_down(u, j);
                 self.set_up(i, j);
+
+                option_items.insert(i);
             } else {
                 panic!("Options must contain known items.");
             }
@@ -214,6 +81,135 @@ impl DancingLinks {
 
         self.node_list.push(Node::new(self.get_node(spacer).top - 1, spacer + 1, 0));
         self.set_down(spacer, self.get_list_len() - 2);
+    }
+
+    pub fn dance(&mut self) {
+        let mut level = 0;
+        let mut solution = Vec::new();
+        let mut exit_level = false;
+
+        let mut total_solutions = 0;
+
+        loop {
+            let check_exit = exit_level;
+            exit_level = false;
+
+            let mut i;
+
+            if self.get_item(0).right != 0 && !check_exit {
+                let mut min_length = usize::MAX;
+                let mut p = self.get_item(0).right;
+                i = p;
+
+                while p != 0 {
+                    let length = self.get_item(p).length;
+
+                    if length < min_length {
+                        min_length = length;
+                        i = p;
+
+                        if min_length == 0 {
+                            break;
+                        }
+                    }
+
+                    p = self.get_item(p).right;
+                }
+
+                self.cover(i);
+
+                if level == solution.len() {
+                    solution.push(self.get_node(i).down);
+                } else if level < solution.len() {
+                    solution[level] = self.get_node(i).down;
+                } else {
+                    panic!("Cannot skip levels in solution.");
+                }
+            } else {
+                if !check_exit {
+                    total_solutions += 1;
+
+                    if total_solutions % 1000000 == 0 {
+                        println!("found another million!");
+                        println!("total so far: {total_solutions}");
+                    }
+                    /*
+                    println!("Visiting solution...");
+                    for j in 0..level {
+                        let mut r = solution[j];
+                        while self.get_node(r).top >= 0 {
+                            r += 1;
+                        }
+
+                        r = self.get_node(r).up;
+                        let position = self.get_item(self.get_node(r).top.try_into().unwrap()).name.clone().unwrap();
+                        let digit = self.get_item(self.get_node(r + 1).top.try_into().unwrap()).name.clone().unwrap().chars().last().unwrap();
+
+                        println!("{} {}", position, digit);
+                    }
+
+                    println!("Finished visiting solution!");
+                    */
+                }
+
+                if level == 0 {
+                    break;
+                }
+
+                level -= 1;
+
+                let mut p = solution[level] - 1;
+
+                while p != solution[level] {
+                    let j = self.get_node(p).top;
+                    if j <= 0 {
+                        p = self.get_node(p).down;
+                    } else {
+                        self.uncover(j.try_into().unwrap());
+                        p -= 1;
+                    }
+                }
+
+                i = self.get_node(solution[level]).top.try_into().unwrap();
+                solution[level] = self.get_node(solution[level]).down;
+            }
+
+            if solution[level] == i {
+                self.uncover(i);
+                exit_level = true;
+            } else {
+                let mut p = solution[level] + 1;
+
+                while p != solution[level] {
+                    let j = self.get_node(p).top;
+                    if j <= 0 {
+                        p = self.get_node(p).up;
+                    } else {
+                        self.cover(j.try_into().unwrap());
+                        p += 1;
+                    }
+                }
+
+                level += 1;
+            }
+        };
+
+        println!("Finished dancing. Found {total_solutions} solutions.");
+    }
+
+    fn cover(&mut self, i: usize) {
+        let mut p = self.get_node(i).down;
+
+        while p != i {
+            self.hide(p);
+            p = self.get_node(p).down;
+        }
+
+        let l = self.get_item(i).left;
+        let r = self.get_item(i).right;
+
+        self.set_right(l, r);
+        self.set_left(r, l);
     }
 
     fn hide(&mut self, p: usize) {
@@ -233,6 +229,21 @@ impl DancingLinks {
                 self.remove_node(t.try_into().unwrap());
                 q += 1;
             }
+        }
+    }
+
+    fn uncover(&mut self, i: usize) {
+        let l = self.get_item(i).left;
+        let r = self.get_item(i).right;
+
+        self.set_right(l, i);
+        self.set_left(r, i);
+
+        let mut p = self.get_node(i).up;
+
+        while p != i {
+            self.unhide(p);
+            p = self.get_node(p).up;
         }
     }
 
@@ -256,33 +267,39 @@ impl DancingLinks {
         }
     }
 
-    pub fn cover(&mut self, i: usize) {
-        let mut p = self.get_node(i).down;
-
-        while p != i {
-            self.hide(p);
-            p = self.get_node(p).down;
-        }
-
-        let l = self.get_item(i).left;
-        let r = self.get_item(i).right;
-
-        self.set_right(l, r);
-        self.set_left(r, l);
+    fn get_item(&self, i: usize) -> &Record {
+        &self.item_header[i]
     }
 
-    pub fn uncover(&mut self, i: usize) {
-        let l = self.get_item(i).left;
-        let r = self.get_item(i).right;
+    fn get_node(&self, i: usize) -> &Node {
+        &self.node_list[i]
+    }
 
-        self.set_right(l, i);
-        self.set_left(r, i);
+    fn get_list_len(&self) -> usize {
+        self.node_list.len()
+    }
 
-        let mut p = self.get_node(i).up;
+    fn add_node(&mut self, i: usize) {
+        self.item_header[i].add_node();
+    }
 
-        while p != i {
-            self.unhide(p);
-            p = self.get_node(p).up;
-        }
+    fn remove_node(&mut self, i: usize) {
+        self.item_header[i].remove_node();
+    }
+
+    fn set_left(&mut self, i: usize, l: usize) {
+        self.item_header[i].left = l;
+    }
+
+    fn set_right(&mut self, i: usize, r: usize) {
+        self.item_header[i].right = r;
+    }
+
+    fn set_up(&mut self, i: usize, u: usize) {
+        self.node_list[i].up = u;
+    }
+
+    fn set_down(&mut self, i: usize, d: usize) {
+        self.node_list[i].down = d;
     }
 }
