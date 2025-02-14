@@ -1,6 +1,7 @@
 mod utils;
 
 use std::collections::{HashMap, HashSet};
+use std::time::{Duration, Instant};
 
 use crate::utils::*;
 
@@ -9,6 +10,8 @@ pub struct DancingLinks {
     node_list: Vec<Node>,
     item_index: HashMap<String, usize>,
     backtrack: Vec<usize>,
+    primary: usize,
+    secondary: usize,
 }
 
 impl DancingLinks {
@@ -22,6 +25,8 @@ impl DancingLinks {
             node_list: Vec::with_capacity(n + 2),
             item_index: HashMap::new(),
             backtrack: Vec::new(),
+            primary: n1,
+            secondary: n2,
         };
 
         dlx.item_header.push(Record::new_unnamed(n1, 1));
@@ -86,13 +91,17 @@ impl DancingLinks {
         self.set_down(spacer, self.get_list_len() - 2);
     }
 
-    pub fn dance(&mut self) {
+    pub fn dance(&mut self) -> (usize, Duration, usize) {
+        let now = Instant::now();
+
         let z = self.get_list_len() - 1;
         self.backtrack
             .resize((-self.get_top(z)).try_into().unwrap(), 0);
 
         let mut level = 0;
+
         let mut solution_count = 0;
+        let mut visited_nodes = 0;
 
         let mut exit_level = false;
 
@@ -103,6 +112,8 @@ impl DancingLinks {
             let mut i;
 
             if self.get_right(0) != 0 && !check_exit {
+                visited_nodes += 1;
+
                 let mut min_length = usize::MAX;
                 let mut p = self.get_right(0);
                 i = p;
@@ -127,6 +138,8 @@ impl DancingLinks {
                 self.backtrack[level] = self.get_down(i);
             } else {
                 if !check_exit {
+                    visited_nodes += 1;
+
                     solution_count += 1;
                 }
 
@@ -174,7 +187,7 @@ impl DancingLinks {
             }
         }
 
-        println!("Finished dancing. Found {solution_count} solutions.");
+        (solution_count, now.elapsed(), visited_nodes)
     }
 
     fn cover(&mut self, i: usize) {
@@ -245,12 +258,20 @@ impl DancingLinks {
         }
     }
 
-    fn add_node(&mut self, i: usize) {
-        self.item_header[i].add_node();
+    pub fn get_primary(&self) -> usize {
+        self.primary
     }
 
-    fn remove_node(&mut self, i: usize) {
-        self.item_header[i].remove_node();
+    pub fn get_secondary(&self) -> usize {
+        self.secondary
+    }
+
+    pub fn get_items(&self) -> usize {
+        self.primary + self.secondary
+    }
+
+    pub fn get_options(&self) -> usize {
+        (-self.get_top(self.get_list_len() - 1)).try_into().unwrap()
     }
 
     fn get_list_len(&self) -> usize {
@@ -295,5 +316,13 @@ impl DancingLinks {
 
     fn set_down(&mut self, i: usize, d: usize) {
         self.node_list[i].down = d;
+    }
+
+    fn add_node(&mut self, i: usize) {
+        self.item_header[i].add_node();
+    }
+
+    fn remove_node(&mut self, i: usize) {
+        self.item_header[i].remove_node();
     }
 }

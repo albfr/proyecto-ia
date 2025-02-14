@@ -61,5 +61,23 @@ fn main() {
         option_buffer.clear();
     }
 
-    dlx.dance();
+    eprintln!(
+        "Read {}+{}={} items and {} options.",
+        dlx.get_primary(),
+        dlx.get_secondary(),
+        dlx.get_items(),
+        dlx.get_options()
+    );
+
+    let (solution_count, elapsed_time, visited_nodes) = dlx.dance();
+
+    if solution_count == 1 {
+        eprintln!(
+            "Found {solution_count} solution in {elapsed_time:?} visiting {visited_nodes} nodes."
+        );
+    } else {
+        eprintln!(
+            "Found {solution_count} solutions in {elapsed_time:?} visiting {visited_nodes} nodes."
+        );
+    }
 }
