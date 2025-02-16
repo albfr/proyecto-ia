@@ -65,8 +65,8 @@ fn main() {
         "Read {}+{}={} items and {} options.",
         dlx.get_primary(),
         dlx.get_secondary(),
-        dlx.get_items(),
-        dlx.get_options()
+        dlx.get_item_count(),
+        dlx.get_option_count()
     );
 
     let (solution_count, elapsed_time, visited_nodes) = dlx.dance();

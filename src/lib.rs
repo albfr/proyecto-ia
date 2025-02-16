@@ -141,6 +141,14 @@ impl DancingLinks {
                     visited_nodes += 1;
 
                     solution_count += 1;
+
+                    println!("Solution {solution_count}:");
+
+                    for l in 0..level {
+                        let option_str = self.get_option_str(self.backtrack[l]);
+
+                        println!("\t{option_str}");
+                    }
                 }
 
                 if level == 0 {
@@ -266,16 +274,45 @@ impl DancingLinks {
         self.secondary
     }
 
-    pub fn get_items(&self) -> usize {
+    pub fn get_item_count(&self) -> usize {
         self.primary + self.secondary
     }
 
-    pub fn get_options(&self) -> usize {
+    pub fn get_option_count(&self) -> usize {
         (-self.get_top(self.get_list_len() - 1)).try_into().unwrap()
     }
 
     fn get_list_len(&self) -> usize {
         self.node_list.len()
+    }
+
+    fn get_option_str(&self, i: usize) -> String {
+        let t = self.get_top(i);
+
+        if t <= 0 {
+            panic!("Node {i} does not correspond to an item in an option.");
+        }
+
+        let mut option_str = self.item_header[t as usize].name.clone().unwrap();
+
+        let mut p = i + 1;
+
+        while p != i {
+            let t = self.get_top(p);
+
+            if t <= 0 {
+                p = self.get_up(p);
+                continue;
+            }
+
+            let name = " ".to_owned() + &self.item_header[t as usize].name.clone().unwrap();
+
+            option_str.push_str(&name);
+
+            p += 1;
+        }
+
+        option_str
     }
 
     fn get_length(&self, i: usize) -> usize {
