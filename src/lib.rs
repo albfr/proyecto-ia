@@ -312,6 +312,24 @@ impl DancingLinks {
             p += 1;
         }
 
+        let t: usize = t.try_into().unwrap();
+
+        let mut p = self.get_down(t);
+
+        let mut k = 1;
+
+        while p != i && p != t {
+            p = self.get_down(p);
+
+            k += 1;
+        }
+
+        if p != t {
+            option_str.push_str(
+                &format!(" ({} of {})", k, self.get_length(t))
+            );
+        }
+
         option_str
     }
 
