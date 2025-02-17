@@ -58,7 +58,7 @@ impl DancingLinks {
 
         self.item_header.push(Record::new(item, i));
         self.node_list.push(Node::new_header(i));
-        self.item_index.insert(item.to_string(), i);
+        self.item_index.insert(String::from(item), i);
     }
 
     pub fn add_option(&mut self, option_str: &str) {
@@ -305,9 +305,9 @@ impl DancingLinks {
                 continue;
             }
 
-            let name = " ".to_owned() + &self.item_header[t as usize].name.clone().unwrap();
-
-            option_str.push_str(&name);
+            option_str.push_str(
+                &format!(" {}", self.item_header[t as usize].name.clone().unwrap())
+            );
 
             p += 1;
         }

@@ -18,7 +18,7 @@ impl Record {
         }
 
         Record {
-            name: Some(name.to_string()),
+            name: Some(String::from(name)),
             length: 0,
             left: i - 1,
             right: i + 1,
