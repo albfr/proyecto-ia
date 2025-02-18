@@ -99,17 +99,48 @@ impl DancingLinks {
             .resize((-self.get_top(z)).try_into().unwrap(), 0);
 
         let mut level = 0;
+        let mut exit_level = false;
+        let mut i;
 
         let mut solution_count = 0;
         let mut visited_nodes = 0;
 
-        let mut exit_level = false;
+        let time_delta = Duration::from_secs(5);
+        let mut time_threshold = time_delta;
 
         loop {
+            let time_elapsed = now.elapsed();
+
+            if time_elapsed >= time_threshold {
+                let mut explored = 0.0;
+                let mut d = 1.0;
+
+                for l in 0..level {
+                    let x = self.backtrack[l];
+
+                    let (position, length) = self.get_option_position(x);
+
+                    d *= length as f64;
+
+                    if let Some(k) = position {
+                        explored += ((k - 1) as f64) / d;
+                    }
+                }
+
+                let elapsed = time_elapsed.as_secs();
+
+                let time_left = (elapsed as f64) * (explored.recip() - 1.0);
+
+                eprintln!(
+                    "[{}s]: {} solutions, {:.5} explored, {}s remaining",
+                    elapsed, solution_count, explored, time_left,
+                );
+
+                time_threshold += time_delta;
+            }
+
             let check_exit = exit_level;
             exit_level = false;
-
-            let mut i;
 
             if self.get_right(0) != 0 && !check_exit {
                 visited_nodes += 1;
@@ -141,14 +172,6 @@ impl DancingLinks {
                     visited_nodes += 1;
 
                     solution_count += 1;
-
-                    println!("Solution {solution_count}:");
-
-                    for l in 0..level {
-                        let option_str = self.get_option_str(self.backtrack[l]);
-
-                        println!("\t{option_str}");
-                    }
                 }
 
                 if level == 0 {
@@ -286,6 +309,34 @@ impl DancingLinks {
         self.node_list.len()
     }
 
+    fn get_option_position(&self, i: usize) -> (Option<usize>, usize) {
+        let t = self.get_top(i);
+
+        if t <= 0 {
+            panic!("Node {i} does not correspond to an item in an option.");
+        }
+
+        let t: usize = t.try_into().unwrap();
+
+        let mut p = self.get_down(t);
+
+        let mut k = 1;
+
+        while p != i && p != t {
+            p = self.get_down(p);
+
+            k += 1;
+        }
+
+        let length = self.get_length(t);
+
+        if p != t {
+            (Some(k), length)
+        } else {
+            (None, length)
+        }
+    }
+
     fn get_option_str(&self, i: usize) -> String {
         let t = self.get_top(i);
 
@@ -305,29 +356,18 @@ impl DancingLinks {
                 continue;
             }
 
-            option_str.push_str(
-                &format!(" {}", self.item_header[t as usize].name.clone().unwrap())
-            );
+            option_str.push_str(&format!(
+                " {}",
+                self.item_header[t as usize].name.clone().unwrap()
+            ));
 
             p += 1;
         }
 
-        let t: usize = t.try_into().unwrap();
+        let (position, length) = self.get_option_position(i);
 
-        let mut p = self.get_down(t);
-
-        let mut k = 1;
-
-        while p != i && p != t {
-            p = self.get_down(p);
-
-            k += 1;
-        }
-
-        if p != t {
-            option_str.push_str(
-                &format!(" ({} of {})", k, self.get_length(t))
-            );
+        if let Some(k) = position {
+            option_str.push_str(&format!(" ({} of {})", k, length));
         }
 
         option_str

@@ -66,18 +66,20 @@ fn main() {
         dlx.get_primary(),
         dlx.get_secondary(),
         dlx.get_item_count(),
-        dlx.get_option_count()
+        dlx.get_option_count(),
     );
 
     let (solution_count, elapsed_time, visited_nodes) = dlx.dance();
 
     if solution_count == 1 {
         eprintln!(
-            "Found {solution_count} solution in {elapsed_time:?} visiting {visited_nodes} nodes."
+            "Found {} solution in {:?} visiting {} nodes.",
+            solution_count, elapsed_time, visited_nodes,
         );
     } else {
         eprintln!(
-            "Found {solution_count} solutions in {elapsed_time:?} visiting {visited_nodes} nodes."
+            "Found {} solutions in {:?} visiting {} nodes.",
+            solution_count, elapsed_time, visited_nodes,
         );
     }
 }
