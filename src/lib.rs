@@ -115,9 +115,7 @@ impl DancingLinks {
                 let mut explored = 0.0;
                 let mut d = 1.0;
 
-                for l in 0..level {
-                    let x = self.backtrack[l];
-
+                for &x in self.backtrack.iter().take(level) {
                     let (position, length) = self.get_option_position(x);
 
                     d *= length as f64;
@@ -129,11 +127,9 @@ impl DancingLinks {
 
                 let elapsed = time_elapsed.as_secs();
 
-                let time_left = (elapsed as f64) * (explored.recip() - 1.0);
-
                 eprintln!(
-                    "[{}s]: {} solutions, {:.5} explored, {}s remaining",
-                    elapsed, solution_count, explored, time_left,
+                    "{}s: {} solutions, {:.5} explored",
+                    elapsed, solution_count, explored,
                 );
 
                 time_threshold += time_delta;
