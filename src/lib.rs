@@ -9,7 +9,6 @@ pub struct DancingLinks {
     item_header: Vec<Record>,
     node_list: Vec<Node>,
     item_index: HashMap<String, usize>,
-    backtrack: Vec<usize>,
     primary: usize,
     secondary: usize,
 }
@@ -24,7 +23,6 @@ impl DancingLinks {
             item_header: Vec::with_capacity(n + 2),
             node_list: Vec::with_capacity(n + 2),
             item_index: HashMap::new(),
-            backtrack: Vec::new(),
             primary: n1,
             secondary: n2,
         };
@@ -95,8 +93,7 @@ impl DancingLinks {
         let now = Instant::now();
 
         let z = self.get_list_len() - 1;
-        self.backtrack
-            .resize((-self.get_top(z)).try_into().unwrap(), 0);
+        let mut backtrack = vec![0; (-self.get_top(z)).try_into().unwrap()];
 
         let mut level = 0;
         let mut exit_level = false;
@@ -118,15 +115,17 @@ impl DancingLinks {
                 let mut explored = 0.0;
                 let mut d = 1.0;
 
-                for &x in self.backtrack.iter().take(level) {
+                for &x in backtrack.iter().take(level) {
                     let (position, length) = self.get_option_position(x);
 
-                    let length_char = char::from_digit(length.try_into().unwrap(), 36).unwrap_or('*');
+                    let length_char =
+                        char::from_digit(length.try_into().unwrap(), 36).unwrap_or('*');
 
                     d *= length as f64;
 
                     if let Some(k) = position {
-                        let position_char = char::from_digit(k.try_into().unwrap(), 36).unwrap_or('*');
+                        let position_char =
+                            char::from_digit(k.try_into().unwrap(), 36).unwrap_or('*');
 
                         branches.push_str(&format!("{}{} ", position_char, length_char));
 
@@ -190,7 +189,7 @@ impl DancingLinks {
 
                 self.cover(i);
 
-                self.backtrack[level] = self.get_down(i);
+                backtrack[level] = self.get_down(i);
             } else {
                 if !check_exit {
                     visited_nodes += 1;
@@ -204,7 +203,7 @@ impl DancingLinks {
 
                 level -= 1;
 
-                let x = self.backtrack[level];
+                let x = backtrack[level];
                 let mut p = x - 1;
 
                 while p != x {
@@ -218,14 +217,14 @@ impl DancingLinks {
                 }
 
                 i = self.get_top(x).try_into().unwrap();
-                self.backtrack[level] = self.get_down(x);
+                backtrack[level] = self.get_down(x);
             }
 
-            if self.backtrack[level] == i {
+            if backtrack[level] == i {
                 self.uncover(i);
                 exit_level = true;
             } else {
-                let x = self.backtrack[level];
+                let x = backtrack[level];
                 let mut p = x + 1;
 
                 while p != x {
