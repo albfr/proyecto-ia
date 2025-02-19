@@ -105,6 +105,7 @@ impl DancingLinks {
         let mut solution_count = 0;
         let mut visited_nodes = 0;
 
+        // TODO: make this configurable
         let time_delta = Duration::from_secs(5);
         let mut time_threshold = time_delta;
 
@@ -112,25 +113,52 @@ impl DancingLinks {
             let time_elapsed = now.elapsed();
 
             if time_elapsed >= time_threshold {
+                let mut branches = String::new();
+
                 let mut explored = 0.0;
                 let mut d = 1.0;
 
                 for &x in self.backtrack.iter().take(level) {
                     let (position, length) = self.get_option_position(x);
 
+                    let length_char = char::from_digit(length.try_into().unwrap(), 36).unwrap_or('*');
+
                     d *= length as f64;
 
                     if let Some(k) = position {
+                        let position_char = char::from_digit(k.try_into().unwrap(), 36).unwrap_or('*');
+
+                        branches.push_str(&format!("{}{} ", position_char, length_char));
+
                         explored += ((k - 1) as f64) / d;
+                    } else {
+                        branches.push_str(&format!("?{} ", length_char));
                     }
                 }
 
                 let elapsed = time_elapsed.as_secs();
 
-                eprintln!(
-                    "{}s: {} solutions, {:.5} explored",
-                    elapsed, solution_count, explored,
-                );
+                // TODO: make this configurable
+                let max_level = 8;
+
+                if branches.len() > 3 * max_level {
+                    branches = branches.chars().take(3 * max_level).collect::<String>();
+                    branches.push_str("...");
+                } else {
+                    branches.pop();
+                }
+
+                if solution_count == 1 {
+                    eprintln!(
+                        "{}s: {} solution, {}, {:.5} explored",
+                        elapsed, solution_count, branches, explored,
+                    );
+                } else {
+                    eprintln!(
+                        "{}s: {} solutions, {}, {:.5} explored",
+                        elapsed, solution_count, branches, explored,
+                    );
+                }
 
                 time_threshold += time_delta;
             }
