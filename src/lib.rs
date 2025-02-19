@@ -138,7 +138,7 @@ impl DancingLinks {
                 let elapsed = time_elapsed.as_secs();
 
                 // TODO: make this configurable
-                let max_level = 8;
+                let max_level = 12;
 
                 if branches.len() > 3 * max_level {
                     branches = branches.chars().take(3 * max_level).collect::<String>();
