@@ -78,7 +78,7 @@ fn main() {
         );
     } else {
         eprintln!(
-            "Found {} solutions in {:?} visiting {} nodes.",
+            "Found {} solutions in {:.5?} visiting {} nodes.",
             solution_count, elapsed_time, visited_nodes,
         );
     }
