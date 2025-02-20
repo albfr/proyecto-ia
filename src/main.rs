@@ -72,12 +72,12 @@ fn main() {
     let (solution_count, elapsed_time, visited_nodes) = dlx.dance();
 
     if solution_count == 1 {
-        eprintln!(
+        println!(
             "Found {} solution in {:?} visiting {} nodes.",
             solution_count, elapsed_time, visited_nodes,
         );
     } else {
-        eprintln!(
+        println!(
             "Found {} solutions in {:.5?} visiting {} nodes.",
             solution_count, elapsed_time, visited_nodes,
         );
