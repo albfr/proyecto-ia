@@ -423,6 +423,8 @@ impl DancingLinks {
 
         if let Some(k) = position {
             option_str.push_str(&format!(" ({} of {})", k, length));
+        } else {
+            option_str.push_str(&format!(" (? of {})", length));
         }
 
         option_str
