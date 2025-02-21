@@ -3,11 +3,11 @@ pub struct Config {
     help: bool,
     solution_interval: usize,
     level_limit: usize,
-    preprocess: bool, // TODO: implement preprocessor
+    preprocess: bool,
     report_delta: u64,
-    randomization_seed: Option<u64>, // TODO: implement randomization
+    randomization_seed: Option<u64>,
     timeout: Option<u64>,
-    verbose: bool, // TODO: implement verbose statistics
+    verbose: bool,
 }
 
 impl Config {

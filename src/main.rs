@@ -22,6 +22,14 @@ fn main() {
         todo!("preprocessor");
     }
 
+    if let Some(_) = config.get_randomization_seed() {
+        todo!("randomization");
+    }
+
+    if config.is_verbose() {
+        todo!("verbose");
+    }
+
     let mut item_buffer = String::new();
 
     let (primary_items, secondary_items) = loop {
