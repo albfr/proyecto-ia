@@ -9,7 +9,7 @@ pub struct Config {
 }
 
 impl Config {
-    pub fn build(args: Vec<String>) -> Result<Self, &'static str> {
+    pub fn build(args: &[String]) -> Result<Self, &'static str> {
         let mut config = Config {
             solution_interval: 0,
             level_limit: 12,
