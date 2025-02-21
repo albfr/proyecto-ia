@@ -4,7 +4,7 @@ pub struct Config {
     level_limit: usize,
     report_delta: u64,
     randomization_seed: Option<u64>, // TODO: implement randomization
-    timeout: Option<u64>, // TODO: implement timeout
+    timeout: Option<u64>,
     verbose: bool, // TODO: implement verbose statistics
 }
 

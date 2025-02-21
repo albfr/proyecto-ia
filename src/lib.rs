@@ -110,8 +110,24 @@ impl DancingLinks {
 
         let level_limit = 3 * config.get_level_limit();
 
+        let timeout = match config.get_timeout() {
+            Some(t) => Some(Duration::from_secs(t)),
+            None => None,
+        };
+
         loop {
             let time_elapsed = now.elapsed();
+
+            match timeout {
+                Some(t) => {
+                    if time_elapsed >= t {
+                        eprintln!("TIMEOUT!");
+
+                        return (solution_count, time_elapsed, visited_nodes);
+                    }
+                },
+                None => (),
+            }
 
             if time_elapsed >= time_threshold {
                 let mut branches = String::new();
