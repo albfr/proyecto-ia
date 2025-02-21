@@ -224,9 +224,7 @@ impl DancingLinks {
                         println!("Solution {}:", solution_count);
 
                         for &x in backtrack.iter().take(level) {
-                            let option_str = self.get_option_str(x);
-
-                            println!(" {}", option_str);
+                            println!(" {}", self.get_option_str(x));
                         }
                     }
                 }
