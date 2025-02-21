@@ -29,6 +29,7 @@ Options:
 ```
 
 Default options:
+
   `-f`: false (does not mean first solution is not printed, if -i=1 it will),
 
   `-h`: false,
