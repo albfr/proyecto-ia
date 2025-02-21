@@ -17,7 +17,7 @@ pub struct DancingLinks {
 }
 
 impl DancingLinks {
-    pub fn new(primary_items: Vec<&str>, secondary_items: Vec<&str>) -> Self {
+    pub fn new(primary_items: &[&str], secondary_items: &[&str]) -> Self {
         let n1 = primary_items.len();
         let n2 = secondary_items.len();
         let n = n1 + n2;

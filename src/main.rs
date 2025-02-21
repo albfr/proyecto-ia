@@ -7,7 +7,7 @@ use dlx::DancingLinks;
 fn main() {
     let args: Vec<String> = env::args().collect();
 
-    let config = Config::build(args).unwrap_or_else(|err| {
+    let config = Config::build(args.as_slice()).unwrap_or_else(|err| {
         panic!("{}", err);
     });
 
@@ -50,7 +50,9 @@ fn main() {
         break (primary, secondary);
     };
 
-    let mut dlx = DancingLinks::new(primary_items, secondary_items);
+    let mut dlx = DancingLinks::new(
+        primary_items.as_slice(), secondary_items.as_slice()
+    );
 
     let mut option_buffer = String::new();
 
