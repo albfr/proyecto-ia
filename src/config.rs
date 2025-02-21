@@ -1,7 +1,7 @@
 pub struct Config {
     help: bool, // TODO: implement help menu
     solution_interval: usize, // TODO: implement solution display
-    level_limit: usize, // TODO: check what happens for 0
+    level_limit: usize,
     report_delta: u64,
     randomization_seed: Option<u64>, // TODO: implement randomization
     timeout: Option<u64>, // TODO: implement timeout

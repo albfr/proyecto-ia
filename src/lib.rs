@@ -107,6 +107,7 @@ impl DancingLinks {
 
         let report_delta = Duration::from_secs(config.get_report_delta());
         let mut time_threshold = report_delta;
+
         let level_limit = 3 * config.get_level_limit();
 
         loop {
@@ -144,18 +145,22 @@ impl DancingLinks {
                     branches = branches.chars().take(level_limit).collect::<String>();
                     branches.push_str("...");
                 } else {
-                    branches.pop();
+                    if !branches.is_empty() {
+                        branches.pop();
+                    }
                 }
 
-                if solution_count == 1 {
+                let s = if solution_count == 1 { "solution" } else { "solutions" };
+
+                if level_limit == 0 {
                     eprintln!(
-                        "{}s: {} solution, {}, {:.5} explored",
-                        elapsed, solution_count, branches, explored,
+                        "{}s: {} {}, {:.5} explored",
+                        elapsed, solution_count, s, explored,
                     );
                 } else {
                     eprintln!(
-                        "{}s: {} solutions, {}, {:.5} explored",
-                        elapsed, solution_count, branches, explored,
+                        "{}s: {} {}, {}, {:.5} explored",
+                        elapsed, solution_count, s, branches, explored,
                     );
                 }
 
