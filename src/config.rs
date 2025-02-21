@@ -1,6 +1,7 @@
 pub struct Config {
+    show_first: bool,
     help: bool, // TODO: implement help menu
-    solution_interval: usize, // TODO: implement solution display
+    solution_interval: usize,
     level_limit: usize,
     report_delta: u64,
     randomization_seed: Option<u64>, // TODO: implement randomization
@@ -11,13 +12,14 @@ pub struct Config {
 impl Config {
     pub fn build(args: &[String]) -> Result<Self, &'static str> {
         let mut config = Config {
+            show_first: false,
+            help: false,
             solution_interval: 0,
             level_limit: 12,
             report_delta: 5,
             randomization_seed: None,
             timeout: None,
             verbose: false,
-            help: false,
         };
 
         let mut args = args.iter();
@@ -26,6 +28,7 @@ impl Config {
             let arg = arg.as_str();
 
             match arg {
+                "--show-first" | "-f" => config.show_first = true,
                 "--help" | "-h" => {
                     config.help = true;
 
@@ -97,6 +100,10 @@ impl Config {
         }
 
         Ok(config)
+    }
+
+    pub fn show_first(&self) -> bool {
+        self.show_first
     }
 
     pub fn is_help(&self) -> bool {

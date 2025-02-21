@@ -105,15 +105,18 @@ impl DancingLinks {
         let mut solution_count = 0;
         let mut visited_nodes = 0;
 
+        let timeout = match config.get_timeout() {
+            Some(t) => Some(Duration::from_secs(t)),
+            None => None,
+        };
+
         let report_delta = Duration::from_secs(config.get_report_delta());
         let mut time_threshold = report_delta;
 
         let level_limit = 3 * config.get_level_limit();
 
-        let timeout = match config.get_timeout() {
-            Some(t) => Some(Duration::from_secs(t)),
-            None => None,
-        };
+        let show_first = config.show_first();
+        let solution_interval = config.get_solution_interval();
 
         loop {
             let time_elapsed = now.elapsed();
@@ -216,6 +219,16 @@ impl DancingLinks {
                     visited_nodes += 1;
 
                     solution_count += 1;
+
+                    if (show_first && solution_count == 1) || (solution_interval > 0 && solution_count % solution_interval == 0) {
+                        println!("Solution {}:", solution_count);
+
+                        for &x in backtrack.iter().take(level) {
+                            let option_str = self.get_option_str(x);
+
+                            println!(" {}", option_str);
+                        }
+                    }
                 }
 
                 if level == 0 {
