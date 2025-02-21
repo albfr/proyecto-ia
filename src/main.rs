@@ -1,5 +1,6 @@
 use std::env;
 use std::io;
+use std::process;
 
 use dlx::config::*;
 use dlx::DancingLinks;
@@ -11,8 +12,14 @@ fn main() {
         panic!("{}", err);
     });
 
-    if config.is_help() {
-        todo!("help menu");
+    if config.help() {
+        config.show_help();
+
+        process::exit(0);
+    }
+
+    if config.preprocess() {
+        todo!("preprocessor");
     }
 
     let mut item_buffer = String::new();

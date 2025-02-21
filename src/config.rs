@@ -1,8 +1,9 @@
 pub struct Config {
     show_first: bool,
-    help: bool, // TODO: implement help menu
+    help: bool,
     solution_interval: usize,
     level_limit: usize,
+    preprocess: bool, // TODO: implement preprocessor
     report_delta: u64,
     randomization_seed: Option<u64>, // TODO: implement randomization
     timeout: Option<u64>,
@@ -16,6 +17,7 @@ impl Config {
             help: false,
             solution_interval: 0,
             level_limit: 12,
+            preprocess: false,
             report_delta: 5,
             randomization_seed: None,
             timeout: None,
@@ -58,6 +60,7 @@ impl Config {
                         return Err(l_err_str);
                     }
                 },
+                "--preprocess" | "-p" => config.preprocess = true,
                 "--report" | "-r" => {
                     let r_err_str = "--report (-r) requires an integer argument";
 
@@ -106,7 +109,7 @@ impl Config {
         self.show_first
     }
 
-    pub fn is_help(&self) -> bool {
+    pub fn help(&self) -> bool {
         self.help
     }
 
@@ -116,6 +119,10 @@ impl Config {
 
     pub fn get_level_limit(&self) -> usize {
         self.level_limit
+    }
+
+    pub fn preprocess(&self) -> bool {
+        self.preprocess
     }
 
     pub fn get_report_delta(&self) -> u64 {
@@ -132,5 +139,47 @@ impl Config {
 
     pub fn is_verbose(&self) -> bool {
         self.verbose
+    }
+
+    pub fn show_help(&self) {
+        println!(
+"An eXact Cover (XC) solver using Dancing Links (DLX).
+
+Usage: ./dlx [OPTIONS]
+
+Enter via stdin a line of items. These must be unique ASCII strings not having
+'|'. This character is a reserved separator of primary and secondary items.
+
+Enter secondary items following '|' if desired.
+
+For example, the following line has 4 primary and 3 secondary items:
+a b c d | e f g
+
+Then, again via stdin, enter an option, one per line. An option is a set of
+items. These must match the names entered previously and cannot repeat in an
+option. Reading of options ends when reaching end-of-file (EOF).
+
+Options:
+  -f, --show-first                 Print first solution if it exists
+  -h, --help                       Print this help menu
+  -i, --solution-interval <SPACE>  Print a solution in intervals of <SPACE>
+  -l, --level-limit <LEVEL>        Show up to <LEVEL> braches in reports
+  -p, --preprocess                 Apply preprocessing to exact cover problem
+  -r, --report <SECS>              Print a report every <SECS> seconds
+  -s, --randomize <SEED>           Pick item to cover in a random fashion
+  -t, --timeout <SECS>             Stop program execution after <SECS> seconds
+  -v, --verbose                    Print verbose output
+
+Default options:
+  -f: false (does not mean first solution is not printed, if -i=1 it will),
+  -h: false,
+  -i: 0 (no solutions are printed by default),
+  -l: 12,
+  -p: false,
+  -r: 5,
+  -s: None (first item of minimum length is chosen),
+  -t: None,
+  -v: false"
+        );
     }
 }
