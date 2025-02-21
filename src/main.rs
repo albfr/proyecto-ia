@@ -1,8 +1,20 @@
+use std::env;
 use std::io;
 
+use dlx::config::*;
 use dlx::DancingLinks;
 
 fn main() {
+    let args: Vec<String> = env::args().collect();
+
+    let config = Config::build(args).unwrap_or_else(|err| {
+        panic!("{}", err);
+    });
+
+    if config.is_help() {
+        todo!("help menu");
+    }
+
     let mut item_buffer = String::new();
 
     let (primary_items, secondary_items) = loop {
@@ -69,7 +81,7 @@ fn main() {
         dlx.get_option_count(),
     );
 
-    let (solution_count, elapsed_time, visited_nodes) = dlx.dance();
+    let (solution_count, elapsed_time, visited_nodes) = dlx.dance(&config);
 
     if solution_count == 1 {
         println!(

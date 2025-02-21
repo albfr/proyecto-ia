@@ -1,8 +1,11 @@
+pub mod config;
+
 mod utils;
 
 use std::collections::{HashMap, HashSet};
 use std::time::{Duration, Instant};
 
+use crate::config::*;
 use crate::utils::*;
 
 pub struct DancingLinks {
@@ -89,7 +92,7 @@ impl DancingLinks {
         self.set_down(spacer, self.get_list_len() - 2);
     }
 
-    pub fn dance(&mut self) -> (usize, Duration, usize) {
+    pub fn dance(&mut self, config: &Config) -> (usize, Duration, usize) {
         let now = Instant::now();
 
         let z = self.get_list_len() - 1;
@@ -102,9 +105,9 @@ impl DancingLinks {
         let mut solution_count = 0;
         let mut visited_nodes = 0;
 
-        // TODO: make this configurable
-        let time_delta = Duration::from_secs(5);
-        let mut time_threshold = time_delta;
+        let report_delta = Duration::from_secs(config.get_report_delta());
+        let mut time_threshold = report_delta;
+        let level_limit = 3 * config.get_level_limit();
 
         loop {
             let time_elapsed = now.elapsed();
@@ -137,11 +140,8 @@ impl DancingLinks {
 
                 let elapsed = time_elapsed.as_secs();
 
-                // TODO: make this configurable
-                let max_level = 12;
-
-                if branches.len() > 3 * max_level {
-                    branches = branches.chars().take(3 * max_level).collect::<String>();
+                if branches.len() > level_limit {
+                    branches = branches.chars().take(level_limit).collect::<String>();
                     branches.push_str("...");
                 } else {
                     branches.pop();
@@ -159,7 +159,7 @@ impl DancingLinks {
                     );
                 }
 
-                time_threshold += time_delta;
+                time_threshold += report_delta;
             }
 
             let check_exit = exit_level;
