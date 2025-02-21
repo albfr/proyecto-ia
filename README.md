@@ -29,21 +29,12 @@ Options:
 ```
 
 Default options:
-
-  `-f`: `false` (does not mean first solution is not printed, if `-i=1` it will),
-
-  `-h`: `false`,
-
-  `-i`: `0` (no solutions are printed by default),
-
-  `-l`: `12`,
-
-  `-p`: `false`,
-
-  `-r`: `5`,
-
-  `-s`: `None` (first item of minimum length is chosen),
-
-  `-t`: `None`,
-
-  `-v`: `false`
+- `-f`: `false` (does not mean first solution is not printed, if `-i=1` it will),
+- `-h`: `false`,
+- `-i`: `0` (no solutions are printed by default),
+- `-l`: `12`,
+- `-p`: `false`,
+- `-r`: `5`,
+- `-s`: `None` (first item of minimum length is chosen),
+- `-t`: `None`,
+- `-v`: `false`
