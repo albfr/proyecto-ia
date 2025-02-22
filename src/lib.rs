@@ -104,7 +104,7 @@ impl DancingLinks {
 
         let mut solution_count = 0;
         let mut visited_nodes = 0;
-        let mut updates = 0;
+        let mut update_count = 0;
         let mut max_degree = 0;
         let mut max_level = 0;
 
@@ -129,7 +129,7 @@ impl DancingLinks {
                         solution_count,
                         time_elapsed,
                         visited_nodes,
-                        updates,
+                        update_count,
                         max_degree,
                         max_level,
                     );
@@ -221,7 +221,7 @@ impl DancingLinks {
                     max_degree = min_length;
                 }
 
-                updates += self.cover(i);
+                update_count += self.cover(i);
 
                 backtrack[level] = self.get_down(i);
             } else {
@@ -280,7 +280,7 @@ impl DancingLinks {
                     if j <= 0 {
                         p = self.get_up(p);
                     } else {
-                        updates += self.cover(j.try_into().unwrap());
+                        update_count += self.cover(j.try_into().unwrap());
                         p += 1;
                     }
                 }
@@ -297,7 +297,7 @@ impl DancingLinks {
             solution_count,
             now.elapsed(),
             visited_nodes,
-            updates,
+            update_count,
             max_degree,
             max_level,
         )
