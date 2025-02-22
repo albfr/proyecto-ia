@@ -397,7 +397,7 @@ impl DancingLinks {
         (-self.get_top(self.get_list_len() - 1)).try_into().unwrap()
     }
 
-    fn get_list_len(&self) -> usize {
+    pub fn get_list_len(&self) -> usize {
         self.node_list.len()
     }
 

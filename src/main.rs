@@ -90,7 +90,8 @@ fn main() {
     let preprocess_time = now.elapsed();
 
     eprintln!(
-        "Read {}+{}={} items and {} options.",
+        "Read {} entries: {}+{}={} items and {} options.",
+        (dlx.get_list_len() - 1) - (dlx.get_item_count() + 1),
         dlx.get_primary(),
         dlx.get_secondary(),
         dlx.get_item_count(),
