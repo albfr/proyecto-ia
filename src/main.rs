@@ -25,7 +25,7 @@ fn main() {
         todo!("preprocessor");
     }
 
-    if let Some(_) = config.get_randomization_seed() {
+    if config.get_randomization_seed().is_some() {
         todo!("randomization");
     }
 

@@ -107,10 +107,7 @@ impl DancingLinks {
         let mut max_degree = 0;
         let mut max_level = 0;
 
-        let timeout = match config.get_timeout() {
-            Some(t) => Some(Duration::from_secs(t)),
-            None => None,
-        };
+        let timeout = config.get_timeout().map(Duration::from_secs);
 
         let report_delta = Duration::from_secs(config.get_report_delta());
         let mut time_threshold = report_delta;
@@ -123,21 +120,18 @@ impl DancingLinks {
         loop {
             let time_elapsed = now.elapsed();
 
-            match timeout {
-                Some(t) => {
-                    if time_elapsed >= t {
-                        println!("TIMEOUT!");
+            if let Some(t) = timeout {
+                if time_elapsed >= t {
+                    println!("TIMEOUT!");
 
-                        return (
-                            solution_count,
-                            time_elapsed,
-                            visited_nodes,
-                            max_degree,
-                            max_level,
-                        );
-                    }
+                    return (
+                        solution_count,
+                        time_elapsed,
+                        visited_nodes,
+                        max_degree,
+                        max_level,
+                    );
                 }
-                None => (),
             }
 
             if time_elapsed >= time_threshold {
@@ -171,10 +165,8 @@ impl DancingLinks {
                 if branches.len() > level_limit {
                     branches = branches.chars().take(level_limit).collect::<String>();
                     branches.push_str("...");
-                } else {
-                    if !branches.is_empty() {
-                        branches.pop();
-                    }
+                } else if !branches.is_empty() {
+                    branches.pop();
                 }
 
                 let s = if solution_count == 1 {
