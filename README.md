@@ -1,5 +1,5 @@
 # dlx
-An eXact Cover (XC) solver using Dancing Links (DLX).
+An eXact Cover (XC) solver.
 
 Usage: `cargo run --release -- [OPTIONS]`
 
@@ -40,4 +40,4 @@ Default options:
 - `-r`: `5`,
 - `-s`: `None` (first item of minimum length is chosen),
 - `-t`: `None`,
-- `-v`: `false`
+- `-v`: `false`.
