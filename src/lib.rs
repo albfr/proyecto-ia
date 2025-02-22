@@ -92,7 +92,7 @@ impl DancingLinks {
         self.set_down(spacer, self.get_list_len() - 2);
     }
 
-    pub fn dance(&mut self, config: &Config) -> (usize, Duration, usize) {
+    pub fn dance(&mut self, config: &Config) -> (usize, Duration, usize, usize, usize) {
         let now = Instant::now();
 
         let z = self.get_list_len() - 1;
@@ -104,6 +104,8 @@ impl DancingLinks {
 
         let mut solution_count = 0;
         let mut visited_nodes = 0;
+        let mut max_degree = 0;
+        let mut max_level = 0;
 
         let timeout = match config.get_timeout() {
             Some(t) => Some(Duration::from_secs(t)),
@@ -124,11 +126,17 @@ impl DancingLinks {
             match timeout {
                 Some(t) => {
                     if time_elapsed >= t {
-                        eprintln!("TIMEOUT!");
+                        println!("TIMEOUT!");
 
-                        return (solution_count, time_elapsed, visited_nodes);
+                        return (
+                            solution_count,
+                            time_elapsed,
+                            visited_nodes,
+                            max_degree,
+                            max_level,
+                        );
                     }
-                },
+                }
                 None => (),
             }
 
@@ -169,7 +177,11 @@ impl DancingLinks {
                     }
                 }
 
-                let s = if solution_count == 1 { "solution" } else { "solutions" };
+                let s = if solution_count == 1 {
+                    "solution"
+                } else {
+                    "solutions"
+                };
 
                 if level_limit == 0 {
                     eprintln!(
@@ -211,6 +223,10 @@ impl DancingLinks {
                     p = self.get_right(p);
                 }
 
+                if max_degree < min_length {
+                    max_degree = min_length;
+                }
+
                 self.cover(i);
 
                 backtrack[level] = self.get_down(i);
@@ -218,9 +234,15 @@ impl DancingLinks {
                 if !check_exit {
                     visited_nodes += 1;
 
+                    if max_level < level + 1 {
+                        max_level = level + 1;
+                    }
+
                     solution_count += 1;
 
-                    if (show_first && solution_count == 1) || (solution_interval > 0 && solution_count % solution_interval == 0) {
+                    if (show_first && solution_count == 1)
+                        || (solution_interval > 0 && solution_count % solution_interval == 0)
+                    {
                         println!("Solution {}:", solution_count);
 
                         for &x in backtrack.iter().take(level) {
@@ -270,10 +292,20 @@ impl DancingLinks {
                 }
 
                 level += 1;
+
+                if max_level < level {
+                    max_level = level;
+                }
             }
         }
 
-        (solution_count, now.elapsed(), visited_nodes)
+        (
+            solution_count,
+            now.elapsed(),
+            visited_nodes,
+            max_degree,
+            max_level,
+        )
     }
 
     fn cover(&mut self, i: usize) {

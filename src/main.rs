@@ -1,11 +1,14 @@
 use std::env;
 use std::io;
 use std::process;
+use std::time::Instant;
 
 use dlx::config::*;
 use dlx::DancingLinks;
 
 fn main() {
+    let now = Instant::now();
+
     let args: Vec<String> = env::args().collect();
 
     let config = Config::build(args.as_slice()).unwrap_or_else(|err| {
@@ -24,10 +27,6 @@ fn main() {
 
     if let Some(_) = config.get_randomization_seed() {
         todo!("randomization");
-    }
-
-    if config.is_verbose() {
-        todo!("verbose");
     }
 
     let mut item_buffer = String::new();
@@ -65,9 +64,7 @@ fn main() {
         break (primary, secondary);
     };
 
-    let mut dlx = DancingLinks::new(
-        primary_items.as_slice(), secondary_items.as_slice()
-    );
+    let mut dlx = DancingLinks::new(primary_items.as_slice(), secondary_items.as_slice());
 
     let mut option_buffer = String::new();
 
@@ -90,6 +87,8 @@ fn main() {
         option_buffer.clear();
     }
 
+    let preprocess_time = now.elapsed();
+
     eprintln!(
         "Read {}+{}={} items and {} options.",
         dlx.get_primary(),
@@ -98,12 +97,35 @@ fn main() {
         dlx.get_option_count(),
     );
 
-    let (solution_count, elapsed_time, visited_nodes) = dlx.dance(&config);
+    let (solution_count, elapsed_time, visited_nodes, max_degree, max_level) = dlx.dance(&config);
 
-    let s = if solution_count == 1 { "solution" } else { "solutions" };
+    let s = if solution_count == 1 {
+        "solution"
+    } else {
+        "solutions"
+    };
+
+    if config.is_verbose() {
+        let total_time = preprocess_time + elapsed_time;
+
+        println!(
+            "The tree's maximum degree is {}, its depth is {}.",
+            max_degree, max_level,
+        );
+
+        println!(
+            "{:.5?} overall: {:.5?} processing input + {:.5?} dancing.",
+            total_time, preprocess_time, elapsed_time,
+        );
+
+        println!(
+            "{:.5?} per solution.",
+            elapsed_time / (solution_count.try_into().unwrap())
+        );
+    }
 
     println!(
-        "Found {} {} in {:?} visiting {} nodes.",
+        "Found {} {} in {:.5?} visiting {} nodes.",
         solution_count, s, elapsed_time, visited_nodes,
     );
 }
