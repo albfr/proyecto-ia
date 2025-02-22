@@ -1,6 +1,14 @@
 # dlx
 An eXact Cover (XC) solver using Dancing Links (DLX).
 
+Compilation:
+```
+cargo build --release
+```
+
+It is *very* important to compile using `--release` since it makes the solver
+run *exponentially* faster.
+
 Usage: `./dlx [OPTIONS]`
 
 Enter via stdin a line of items. These must be unique ASCII strings not having
