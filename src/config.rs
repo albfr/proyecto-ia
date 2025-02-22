@@ -35,7 +35,7 @@ impl Config {
                     config.help = true;
 
                     return Ok(config);
-                },
+                }
                 "--solution-interval" | "-i" => {
                     let i_err_str = "--solution-interval (-i) requires an integer argument";
 
@@ -47,7 +47,7 @@ impl Config {
                     } else {
                         return Err(i_err_str);
                     }
-                },
+                }
                 "--level-limit" | "-l" => {
                     let l_err_str = "--level-limit (-l) requires an integer argument";
 
@@ -59,7 +59,7 @@ impl Config {
                     } else {
                         return Err(l_err_str);
                     }
-                },
+                }
                 "--preprocess" | "-p" => config.preprocess = true,
                 "--report" | "-r" => {
                     let r_err_str = "--report (-r) requires an integer argument";
@@ -72,7 +72,7 @@ impl Config {
                     } else {
                         return Err(r_err_str);
                     }
-                },
+                }
                 "--randomize" | "-s" => {
                     let s_err_str = "--randomize (-s) requires an integer argument";
 
@@ -84,7 +84,7 @@ impl Config {
                     } else {
                         return Err(s_err_str);
                     }
-                },
+                }
                 "--timeout" | "-t" => {
                     let t_err_str = "--timeout (-t) requires an integer argument";
 
@@ -96,7 +96,7 @@ impl Config {
                     } else {
                         return Err(t_err_str);
                     }
-                },
+                }
                 "--verbose" | "-v" => config.verbose = true,
                 _ => (),
             }
@@ -179,7 +179,7 @@ Default options:
   -r: 5,
   -s: None (first item of minimum length is chosen),
   -t: None,
-  -v: false"
+  -v: false."
         );
     }
 }
