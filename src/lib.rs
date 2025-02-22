@@ -92,7 +92,7 @@ impl DancingLinks {
         self.set_down(spacer, self.get_list_len() - 2);
     }
 
-    pub fn dance(&mut self, config: &Config) -> (usize, Duration, usize, usize, usize) {
+    pub fn dance(&mut self, config: &Config) -> (usize, Duration, usize, usize, usize, usize) {
         let now = Instant::now();
 
         let z = self.get_list_len() - 1;
@@ -104,6 +104,7 @@ impl DancingLinks {
 
         let mut solution_count = 0;
         let mut visited_nodes = 0;
+        let mut updates = 0;
         let mut max_degree = 0;
         let mut max_level = 0;
 
@@ -128,6 +129,7 @@ impl DancingLinks {
                         solution_count,
                         time_elapsed,
                         visited_nodes,
+                        updates,
                         max_degree,
                         max_level,
                     );
@@ -219,7 +221,7 @@ impl DancingLinks {
                     max_degree = min_length;
                 }
 
-                self.cover(i);
+                updates += self.cover(i);
 
                 backtrack[level] = self.get_down(i);
             } else {
@@ -278,7 +280,7 @@ impl DancingLinks {
                     if j <= 0 {
                         p = self.get_up(p);
                     } else {
-                        self.cover(j.try_into().unwrap());
+                        updates += self.cover(j.try_into().unwrap());
                         p += 1;
                     }
                 }
@@ -295,16 +297,19 @@ impl DancingLinks {
             solution_count,
             now.elapsed(),
             visited_nodes,
+            updates,
             max_degree,
             max_level,
         )
     }
 
-    fn cover(&mut self, i: usize) {
+    fn cover(&mut self, i: usize) -> usize {
+        let mut updates = 1;
+
         let mut p = self.get_down(i);
 
         while p != i {
-            self.hide(p);
+            updates += self.hide(p);
             p = self.get_down(p);
         }
 
@@ -313,9 +318,13 @@ impl DancingLinks {
 
         self.set_right(l, r);
         self.set_left(r, l);
+
+        updates
     }
 
-    fn hide(&mut self, p: usize) {
+    fn hide(&mut self, p: usize) -> usize {
+        let mut updates = 0;
+
         let mut q = p + 1;
 
         while q != p {
@@ -326,12 +335,16 @@ impl DancingLinks {
             if t <= 0 {
                 q = u;
             } else {
+                updates += 1;
+
                 self.set_down(u, d);
                 self.set_up(d, u);
                 self.remove_node(t.try_into().unwrap());
                 q += 1;
             }
         }
+
+        updates
     }
 
     fn uncover(&mut self, i: usize) {

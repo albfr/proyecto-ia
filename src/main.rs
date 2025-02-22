@@ -97,7 +97,8 @@ fn main() {
         dlx.get_option_count(),
     );
 
-    let (solution_count, elapsed_time, visited_nodes, max_degree, max_level) = dlx.dance(&config);
+    let (solution_count, elapsed_time, visited_nodes, updates, max_degree, max_level) =
+        dlx.dance(&config);
 
     let s = if solution_count == 1 {
         "solution"
@@ -125,7 +126,7 @@ fn main() {
     }
 
     println!(
-        "Found {} {} in {:.5?} visiting {} nodes.",
-        solution_count, s, elapsed_time, visited_nodes,
+        "Found {} {} in {:.5?} visiting {} nodes doing {} updates.",
+        solution_count, s, elapsed_time, visited_nodes, updates,
     );
 }
