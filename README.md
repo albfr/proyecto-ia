@@ -1,15 +1,7 @@
 # dlx
 An eXact Cover (XC) solver using Dancing Links (DLX).
 
-Compilation:
-```
-cargo build --release
-```
-
-It is *very* important to compile using `--release` since it makes the solver
-run *exponentially* faster.
-
-Usage: `./dlx [OPTIONS]`
+Usage: `cargo run --release -- [OPTIONS]`
 
 Enter via stdin a line of items. These must be unique ASCII strings not having
 `'|'`. This character is a reserved separator of primary and secondary items.
@@ -22,6 +14,9 @@ For example, the following line has 4 primary and 3 secondary items:
 Then, again via stdin, enter an option, one per line. An option is a set of
 items. These must match the names entered previously and cannot repeat in an
 option. Reading of options ends when reaching end-of-file (EOF).
+
+It is *very* important to compile using `--release` since it makes the solver
+run *much* faster.
 
 Options:
 ```
