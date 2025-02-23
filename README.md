@@ -24,7 +24,6 @@ Options:
   -h, --help                       Print this help menu
   -i, --solution-interval <SPACE>  Print a solution in intervals of <SPACE>
   -l, --level-limit <LEVEL>        Show up to <LEVEL> braches in reports
-  -p, --preprocess                 Apply preprocessing to exact cover problem
   -r, --report <SECS>              Print a report every <SECS> seconds
   -s, --randomize <SEED>           Pick item to cover in a random fashion
   -t, --timeout <SECS>             Stop program execution after <SECS> seconds
@@ -36,7 +35,6 @@ Default options:
 - `-h`: `false`,
 - `-i`: `0` (no solutions are printed by default),
 - `-l`: `12`,
-- `-p`: `false`,
 - `-r`: `5`,
 - `-s`: `None` (first item of minimum length is chosen),
 - `-t`: `None`,

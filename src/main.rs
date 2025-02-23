@@ -21,10 +21,6 @@ fn main() {
         process::exit(0);
     }
 
-    if config.preprocess() {
-        todo!("preprocessor");
-    }
-
     if config.get_randomization_seed().is_some() {
         todo!("randomization");
     }

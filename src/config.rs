@@ -3,7 +3,6 @@ pub struct Config {
     help: bool,
     solution_interval: usize,
     level_limit: usize,
-    preprocess: bool,
     report_delta: u64,
     randomization_seed: Option<u64>,
     timeout: Option<u64>,
@@ -17,7 +16,6 @@ impl Config {
             help: false,
             solution_interval: 0,
             level_limit: 12,
-            preprocess: false,
             report_delta: 5,
             randomization_seed: None,
             timeout: None,
@@ -60,7 +58,6 @@ impl Config {
                         return Err(l_err_str);
                     }
                 }
-                "--preprocess" | "-p" => config.preprocess = true,
                 "--report" | "-r" => {
                     let r_err_str = "--report (-r) requires an integer argument";
 
@@ -121,10 +118,6 @@ impl Config {
         self.level_limit
     }
 
-    pub fn preprocess(&self) -> bool {
-        self.preprocess
-    }
-
     pub fn get_report_delta(&self) -> u64 {
         self.report_delta
     }
@@ -164,7 +157,6 @@ Options:
   -h, --help                       Print this help menu
   -i, --solution-interval <SPACE>  Print a solution in intervals of <SPACE>
   -l, --level-limit <LEVEL>        Show up to <LEVEL> braches in reports
-  -p, --preprocess                 Apply preprocessing to exact cover problem
   -r, --report <SECS>              Print a report every <SECS> seconds
   -s, --randomize <SEED>           Pick item to cover in a random fashion
   -t, --timeout <SECS>             Stop program execution after <SECS> seconds
@@ -175,7 +167,6 @@ Default options:
   -h: false,
   -i: 0 (no solutions are printed by default),
   -l: 12,
-  -p: false,
   -r: 5,
   -s: None (first item of minimum length is chosen),
   -t: None,
