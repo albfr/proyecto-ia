@@ -171,20 +171,16 @@ impl DancingLinks {
                     branches.pop();
                 }
 
-                let s = if solution_count == 1 {
-                    "solution"
-                } else {
-                    "solutions"
-                };
+                let s = if solution_count == 1 { "" } else { "s" };
 
                 if level_limit == 0 {
                     eprintln!(
-                        "{}s: {} {}, {:.5} explored",
+                        "{}s: {} solution{}, {:.5} explored",
                         elapsed, solution_count, s, explored,
                     );
                 } else {
                     eprintln!(
-                        "{}s: {} {}, {}, {:.5} explored",
+                        "{}s: {} solution{}, {}, {:.5} explored",
                         elapsed, solution_count, s, branches, explored,
                     );
                 }

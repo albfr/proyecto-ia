@@ -97,11 +97,7 @@ fn main() {
     let (solution_count, elapsed_time, visited_nodes, update_count, max_degree, max_level) =
         dlx.dance(&config);
 
-    let s = if solution_count == 1 {
-        "solution"
-    } else {
-        "solutions"
-    };
+    let s = if solution_count == 1 { "" } else { "s" };
 
     if config.is_verbose() {
         let total_time = preprocess_time + elapsed_time;
@@ -123,7 +119,7 @@ fn main() {
     }
 
     println!(
-        "Found {} {} in {:.5?} visiting {} nodes doing {} updates.",
+        "Found {} solution{} in {:.5?} visiting {} nodes doing {} updates.",
         solution_count, s, elapsed_time, visited_nodes, update_count,
     );
 }
