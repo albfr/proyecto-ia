@@ -1,3 +1,4 @@
+#[derive(Clone)]
 pub struct Config {
     show_first: bool,
     help: bool,

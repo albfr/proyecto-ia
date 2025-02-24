@@ -21,10 +21,6 @@ fn main() {
         process::exit(0);
     }
 
-    if config.get_randomization_seed().is_some() {
-        todo!("randomization");
-    }
-
     let mut item_buffer = String::new();
 
     let (primary_items, secondary_items) = loop {
@@ -60,7 +56,7 @@ fn main() {
         break (primary, secondary);
     };
 
-    let mut dlx = DancingLinks::new(primary_items.as_slice(), secondary_items.as_slice());
+    let mut dlx = DancingLinks::new(&config, primary_items.as_slice(), secondary_items.as_slice());
 
     let mut option_buffer = String::new();
 
@@ -94,8 +90,7 @@ fn main() {
         dlx.get_option_count(),
     );
 
-    let (solution_count, elapsed_time, visited_nodes, update_count, max_degree, max_level) =
-        dlx.dance(&config);
+    let (solution_count, elapsed_time, visited_nodes, update_count, max_degree, max_level) = dlx.dance();
 
     let s = if solution_count == 1 { "" } else { "s" };
 

@@ -5,6 +5,8 @@ mod utils;
 use std::collections::{HashMap, HashSet};
 use std::time::{Duration, Instant};
 
+use rand::prelude::*;
+
 use crate::config::*;
 use crate::utils::*;
 
@@ -14,10 +16,11 @@ pub struct DancingLinks {
     item_index: HashMap<String, usize>,
     primary: usize,
     secondary: usize,
+    config: Config,
 }
 
 impl DancingLinks {
-    pub fn new(primary_items: &[&str], secondary_items: &[&str]) -> Self {
+    pub fn new(config: &Config, primary_items: &[&str], secondary_items: &[&str]) -> Self {
         let n1 = primary_items.len();
         let n2 = secondary_items.len();
         let n = n1 + n2;
@@ -28,6 +31,7 @@ impl DancingLinks {
             item_index: HashMap::new(),
             primary: n1,
             secondary: n2,
+            config: config.clone(),
         };
 
         dlx.item_header.push(Record::new_unnamed(n1, 1));
@@ -92,7 +96,7 @@ impl DancingLinks {
         self.set_down(spacer, self.get_list_len() - 2);
     }
 
-    pub fn dance(&mut self, config: &Config) -> (usize, Duration, usize, usize, usize, usize) {
+    pub fn dance(&mut self) -> (usize, Duration, usize, usize, usize, usize) {
         let now = Instant::now();
 
         let z = self.get_list_len() - 1;
@@ -102,21 +106,26 @@ impl DancingLinks {
         let mut exit_level = false;
         let mut i;
 
+        let mut rng = match self.config.get_randomization_seed() {
+            Some(seed) => StdRng::seed_from_u64(seed),
+            None => StdRng::from_os_rng(),
+        };
+
         let mut solution_count = 0;
         let mut visited_nodes = 0;
         let mut update_count = 0;
         let mut max_degree = 0;
         let mut max_level = 0;
 
-        let timeout = config.get_timeout().map(Duration::from_secs);
+        let timeout = self.config.get_timeout().map(Duration::from_secs);
 
-        let report_delta = Duration::from_secs(config.get_report_delta());
+        let report_delta = Duration::from_secs(self.config.get_report_delta());
         let mut time_threshold = report_delta;
 
-        let level_limit = 3 * config.get_level_limit();
+        let level_limit = 3 * self.config.get_level_limit();
 
-        let show_first = config.show_first();
-        let solution_interval = config.get_solution_interval();
+        let show_first = self.config.show_first();
+        let solution_interval = self.config.get_solution_interval();
 
         loop {
             let time_elapsed = now.elapsed();
@@ -194,8 +203,12 @@ impl DancingLinks {
             if self.get_right(0) != 0 && !check_exit {
                 visited_nodes += 1;
 
-                let mut min_length = usize::MAX;
+                let mut min_length = z;
+
                 let mut p = self.get_right(0);
+
+                let mut candidates = vec![p];
+
                 i = p;
 
                 while p != 0 {
@@ -203,14 +216,21 @@ impl DancingLinks {
 
                     if length < min_length {
                         min_length = length;
-                        i = p;
 
-                        if min_length == 0 {
-                            break;
-                        }
+                        candidates.clear();
+
+                        candidates.push(p);
+
+                        i = p;
+                    } else if length == min_length {
+                        candidates.push(p);
                     }
 
                     p = self.get_right(p);
+                }
+
+                if self.config.get_randomization_seed().is_some() {
+                    i = *candidates.choose(&mut rng).unwrap();
                 }
 
                 if max_degree < min_length {
