@@ -104,8 +104,8 @@ impl DancingLinks {
 
         let mut level = 0;
         let mut exit_level = false;
-        let mut candidates;
         let mut i;
+        let mut candidates;
 
         let mut rng = match self.config.get_randomization_seed() {
             Some(seed) => StdRng::seed_from_u64(seed),
