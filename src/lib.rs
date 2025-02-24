@@ -205,11 +205,7 @@ impl DancingLinks {
                 visited_nodes += 1;
 
                 let mut min_length = z;
-
                 let mut p = self.get_right(0);
-
-                candidates = 1;
-
                 i = p;
 
                 while p != 0 {
@@ -217,19 +213,34 @@ impl DancingLinks {
 
                     if length < min_length {
                         min_length = length;
-
-                        candidates = 1;
-
                         i = p;
-                    } else if self.config.get_randomization_seed().is_some() && length == min_length {
-                        candidates += 1;
 
-                        if rng.random_range(0..candidates) == 0 {
-                            i = p;
+                        if min_length == 0 {
+                            break;
                         }
                     }
 
                     p = self.get_right(p);
+                }
+
+                if self.config.get_randomization_seed().is_some() {
+                    p = self.get_right(0);
+
+                    candidates = 0;
+
+                    while p != 0 {
+                        let length = self.get_length(p);
+
+                        if length == min_length {
+                            candidates += 1;
+
+                            if rng.random_range(0..candidates) == 0 {
+                                i = p;
+                            }
+                        }
+
+                        p = self.get_right(p);
+                    }
                 }
 
                 if max_degree < min_length {
