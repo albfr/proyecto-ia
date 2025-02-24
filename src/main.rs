@@ -3,8 +3,8 @@ use std::io;
 use std::process;
 use std::time::Instant;
 
-use dlx::config::*;
 use dlx::DancingLinks;
+use dlx::config::*;
 
 fn main() {
     let now = Instant::now();
@@ -56,7 +56,11 @@ fn main() {
         break (primary, secondary);
     };
 
-    let mut dlx = DancingLinks::new(&config, primary_items.as_slice(), secondary_items.as_slice());
+    let mut dlx = DancingLinks::new(
+        &config,
+        primary_items.as_slice(),
+        secondary_items.as_slice(),
+    );
 
     let mut option_buffer = String::new();
 
