@@ -104,6 +104,7 @@ impl DancingLinks {
 
         let mut level = 0;
         let mut exit_level = false;
+        let mut candidates;
         let mut i;
 
         let mut rng = match self.config.get_randomization_seed() {
@@ -207,7 +208,7 @@ impl DancingLinks {
 
                 let mut p = self.get_right(0);
 
-                let mut candidates = vec![p];
+                candidates = 1;
 
                 i = p;
 
@@ -217,20 +218,18 @@ impl DancingLinks {
                     if length < min_length {
                         min_length = length;
 
-                        candidates.clear();
-
-                        candidates.push(p);
+                        candidates = 1;
 
                         i = p;
-                    } else if length == min_length {
-                        candidates.push(p);
+                    } else if self.config.get_randomization_seed().is_some() && length == min_length {
+                        candidates += 1;
+
+                        if rng.random_range(0..candidates) == 0 {
+                            i = p;
+                        }
                     }
 
                     p = self.get_right(p);
-                }
-
-                if self.config.get_randomization_seed().is_some() {
-                    i = *candidates.choose(&mut rng).unwrap();
                 }
 
                 if max_degree < min_length {
