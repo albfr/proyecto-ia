@@ -1,7 +1,12 @@
 # dlx
 An eXact Cover (XC) solver.
 
-Usage: `cargo run --release -- [OPTIONS]`
+## Usage
+
+`cargo run --release -- [OPTIONS]`
+
+It is *very* important to compile using `--release` since it makes the solver
+run *much* faster.
 
 Enter via stdin a line of items. These must be unique ASCII strings not having
 `'|'`. This character is a reserved separator of primary and secondary items.
@@ -9,16 +14,14 @@ Enter via stdin a line of items. These must be unique ASCII strings not having
 Enter secondary items following `'|'` if desired.
 
 For example, the following line has 4 primary and 3 secondary items:
+
 `a b c d | e f g`
 
 Then, again via stdin, enter an option, one per line. An option is a set of
 items. These must match the names entered previously and cannot repeat in an
 option. Reading of options ends when reaching end-of-file (EOF).
 
-It is *very* important to compile using `--release` since it makes the solver
-run *much* faster.
-
-Options:
+## Options
 ```
   -f, --show-first                 Print first solution if it exists
   -h, --help                       Print this help menu
@@ -30,7 +33,7 @@ Options:
   -v, --verbose                    Print verbose output
 ```
 
-Default options:
+### Default values
 - `-f`: `false` (does not mean first solution is not printed, if `-i=1` it will),
 - `-h`: `false`,
 - `-i`: `0` (no solutions are printed by default),
@@ -39,3 +42,30 @@ Default options:
 - `-s`: `None` (first item of minimum length is chosen),
 - `-t`: `None`,
 - `-v`: `false`.
+
+## Comments
+
+Currently `dlx` *only* supports generalized XC (i. e. XC + secondary items).
+Plans to support further generalizations of XC are planned! As well as creating
+a problem preprocessor and parsers to make I/O of famous puzzles easier
+(queens, sudoku, polyomino packing...)
+
+### A sketch of what's to come
+
+- Option to write solutions and running-time statistics into a file,
+- Generalize solver to handle a wider range of XC problems:
+    - eXact Covering with Colors (XCC): `colorful_dance()`,
+    - Multiple Covering with Colors (MCC): `multiple_dance()`,
+    - Minimum cost covering: X$, C$, M$,
+    - Output a Zero-suppressed Binary Decision Diagram.
+- Problem preprocessor to remove redundant items/options,
+- Puzzle parser to `dlx` supported format:
+    - n queens placing,
+    - Sudoku,
+    - Polyomino packing,
+    - Futoshiki,
+    - KenKen,
+    - Hidato,
+    - Kakuro,
+    - Hitori,
+    - And maybe others!
