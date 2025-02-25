@@ -47,8 +47,7 @@ option. Reading of options ends when reaching end-of-file (EOF).
 
 Currently `dlx` *only* supports generalized XC (i. e. XC + secondary items).
 Plans to support further generalizations of XC are planned! As well as creating
-a problem preprocessor and parsers to make I/O of famous puzzles easier
-(queens, sudoku, polyomino packing...)
+a problem preprocessor and parsers to make I/O of famous puzzles easier.
 
 ### A sketch of what's to come
 
